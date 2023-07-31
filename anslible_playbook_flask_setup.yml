@@ -1,0 +1,83 @@
+---
+- name: Install Flask server on VM
+  hosts: webserver  # Replace with the target VM's hostname or IP address
+  become: yes         # Run tasks with sudo
+
+  tasks:
+    # Update apt cache (for Debian/Ubuntu) or yum cache (for CentOS/RHEL)
+    - name: Update package cache
+      become: yes
+      apt:
+        update_cache: yes
+      when: ansible_os_family == 'Debian' or ansible_distribution == 'Ubuntu'
+
+    - name: Install required packages
+      become: yes
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - python3-pip
+        - python3-venv
+        - nginx
+      when: ansible_os_family == 'Debian' or ansible_distribution == 'Ubuntu'
+
+    - name: Install required packages
+      become: yes
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - python3-pip
+        - python3-virtualenv
+        - nginx
+      when: ansible_os_family == 'RedHat' or ansible_distribution == 'CentOS'
+
+    - name: Create Flask app directory
+      become: yes
+      file:
+        path: /var/www/flask_app
+        state: directory
+        owner: your_username
+        group: your_group
+        mode: '0755'
+
+    - name: Copy Flask app files
+      become: yes
+      copy:
+        src: /path/to/your/flask/app  # Replace with the path to your Flask app files
+        dest: /var/www/flask_app
+        owner: your_username
+        group: your_group
+
+    - name: Set up virtual environment
+      become: yes
+      command: python3 -m venv /var/www/flask_app/venv
+
+    - name: Install Flask and required packages
+      become: yes
+      pip:
+        requirements: /var/www/flask_app/requirements.txt
+        virtualenv: /var/www/flask_app/venv
+
+    - name: Configure Nginx
+      become: yes
+      template:
+        src: templates/nginx_config.j2
+        dest: /etc/nginx/sites-available/flask_app
+      notify:
+        - Restart Nginx
+
+    - name: Enable Nginx site
+      become: yes
+      file:
+        src: /etc/nginx/sites-available/flask_app
+        dest: /etc/nginx/sites-enabled/flask_app
+        state: link
+
+  handlers:
+    - name: Restart Nginx
+      become: yes
+      service:
+        name: nginx
+        state: restarted
