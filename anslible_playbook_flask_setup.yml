@@ -1,40 +1,43 @@
 ---
-- name: Setup Flask App on VM
-  hosts: your_vm_hostname_or_ip
+- name: Build and Run Flask Container
+  hosts: webserver
   become: yes
 
   tasks:
-    - name: Install Python and pip
+    - name: Install Docker
       apt:
-        name: "{{ item }}"
+        name: docker.io
         state: present
-      loop:
-        - python3
-        - python3-pip
 
-    - name: Install virtualenv
-      pip:
-        name: virtualenv
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
 
-    - name: Create a virtual environment
-      command: virtualenv /var/www/flask_app/venv
-      args:
-        creates: /var/www/flask_app/venv
+    # - name: Copy Flask app files to VM
+    #   copy:
+    #     src: ~/Documents/Github/Issue_Tracker
+    #     dest: /var/www/flask_app
+    
+    - name: Build Docker image
+      docker_image:
+        name: my-flask-app
+        source: build
+        build:
+          path: /var/www/flask_app/Issue_Tracker
+        state: present   
 
-    - name: Copy Flask app files to VM
-      copy:
-        src: ~/Documents/Github/Issue_Tracker/
-        dest: /var/www/flask_app/Issue_Tracker
-      remote_src: yes
+    - name: Stop Docker container
+      docker_container:
+        name: flask-container
+        image: my-flask-app
+        state: stopped  
 
-    - name: Activate virtual environment
-      command: source /var/www/flask_app/venv/bin/activate
-
-    - name: Install Flask and dependencies
-      pip:
-        requirements: /var/www/flask_app/Issue_Tracker/requirements.txt
-
-    - name: Start the Flask app
-      command: /var/www/flask_app/venv/bin/python /var/www/flask_app/Issue_Tracker/app.py
-      async: 0
-      poll: 0
+    - name: Run Docker container
+      docker_container:
+        name: flask-container
+        image: my-flask-app
+        ports:
+          - "8000:8000"
+        state: started  
+        restart_policy: always
