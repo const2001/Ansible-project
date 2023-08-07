@@ -19,6 +19,11 @@
     #   copy:
     #     src: ~/Documents/Github/Issue_Tracker
     #     dest: /var/www/flask_app
+    - name: Stop Docker container
+      docker_container:
+        name: flask-container
+        image: my-flask-app
+        state: stopped  
     
     - name: Build Docker image
       docker_image:
@@ -28,11 +33,7 @@
           path: /var/www/flask_app/Issue_Tracker
         state: present   
 
-    - name: Stop Docker container
-      docker_container:
-        name: flask-container
-        image: my-flask-app
-        state: stopped  
+    
 
     - name: Run Docker container
       docker_container:
