@@ -7,6 +7,18 @@
 
   tasks:
     - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+---
+- name: Build and Run Flask Container
+  hosts: azurehosts
+  remote_user: azureuser
+  gather_facts: false
+  become: yes
+
+  tasks:
+    - name: Install Docker
       become: true
       apt:
         name: docker.io
@@ -17,6 +29,12 @@
       service:
         name: docker
         state: started
+
+    - name: Copy Flask app files to VM
+      copy:
+        src: ~/workspace/Issue_Tracker
+        dest: /var/www/flask_app
+    
 
     - name: Stop and Remove Existing Docker container
       become: true
@@ -30,3 +48,5 @@
     - name: Run Docker container
       become: true
       shell: docker run -d --name flask-container -p 8000:8000 --restart always my-flask-app
+
+    
