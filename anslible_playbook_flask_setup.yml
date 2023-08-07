@@ -20,7 +20,7 @@
 
     - name: Copy Flask app files to VM
       copy:
-        src: ~/workspace/Issue_Tracker
+        src: ~/workspace/flask_vm_docker_setup
         dest: /var/www/flask_app
     
 
