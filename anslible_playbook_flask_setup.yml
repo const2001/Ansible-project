@@ -1,66 +1,40 @@
 ---
-- name: Install Flask server on VM
-  hosts: webserver  # Replace with the target VM's hostname or IP address
-  become: yes         # Run tasks with sudo
+- name: Setup Flask App on VM
+  hosts: your_vm_hostname_or_ip
+  become: yes
 
   tasks:
-    # Update apt cache (for Debian/Ubuntu) or yum cache (for CentOS/RHEL)
-    - name: Update package cache
-      become: yes
-      apt:
-        update_cache: yes
-      when: ansible_os_family == 'Debian' or ansible_distribution == 'Ubuntu'
-
-    - name: Install required packages
-      become: yes
+    - name: Install Python and pip
       apt:
         name: "{{ item }}"
         state: present
       loop:
+        - python3
         - python3-pip
-        - python3-venv
-        - nginx
-      when: ansible_os_family == 'Debian' or ansible_distribution == 'Ubuntu'
 
-    - name: Install required packages
-      become: yes
-      yum:
-        name: "{{ item }}"
-        state: present
-      loop:
-        - python3-pip
-        - python3-virtualenv
-        - nginx
-      when: ansible_os_family == 'RedHat' or ansible_distribution == 'CentOS'
+    - name: Install virtualenv
+      pip:
+        name: virtualenv
 
-    - name: Create Flask app directory
-      become: yes
-      file:
-        path: /var/www/flask_app
-        state: directory
-        owner: azureuser
-        group: azureuser
-        mode: '0755'
+    - name: Create a virtual environment
+      command: virtualenv /var/www/flask_app/venv
+      args:
+        creates: /var/www/flask_app/venv
 
-    # - name: Copy Flask app files
-    #   become: yes
-    #   copy:
-    #     src: ~/Documents/Github/Issue_Tracker/ # Replace with the path to your Flask app files
-    #     dest: /var/www/flask_app/Issue_Tracker/
-    #     owner: azureuser
-    #     group: azureuser
+    - name: Copy Flask app files to VM
+      copy:
+        src: ~/Documents/Github/Issue_Tracker/
+        dest: /var/www/flask_app/Issue_Tracker
+      remote_src: yes
 
-    - name: Set up virtual environment
-      become: yes
-      command: python3 -m venv /var/www/flask_app/Issue_Tracker/venv
+    - name: Activate virtual environment
+      command: source /var/www/flask_app/venv/bin/activate
 
-    - name: Install Flask and required packages
-      become: yes
+    - name: Install Flask and dependencies
       pip:
         requirements: /var/www/flask_app/Issue_Tracker/requirements.txt
-        virtualenv: /var/www/flask_app/Issue_Tracker/venv
 
-    - name: Run Python application
-      command: /usr/bin/python3 /var/www/flask_app/Issue_Tracker/app.py
-
-  
+    - name: Start the Flask app
+      command: /var/www/flask_app/venv/bin/python /var/www/flask_app/Issue_Tracker/app.py
+      async: 0
+      poll: 0
