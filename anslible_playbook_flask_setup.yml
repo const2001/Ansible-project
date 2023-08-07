@@ -18,9 +18,9 @@
         name: docker
         state: started
 
-    - name: Stop Docker container
+    - name: Stop and Remove Existing Docker container
       become: true
-      shell: docker stop flask-container
+      shell: docker rm -f flask-container
       ignore_errors: yes
 
     - name: Build Docker image
