@@ -31,7 +31,7 @@
 
     - name: Build Docker image
       become: true
-      shell: docker build -t my-flask-app /var/www/flask_app/Issue_Tracker
+      shell: docker build -t my-flask-app /var/www/flask_app/flask_vm_docker_setup
 
     - name: Run Docker container
       become: true
