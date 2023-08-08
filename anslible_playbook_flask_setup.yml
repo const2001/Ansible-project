@@ -18,10 +18,10 @@
         name: docker
         state: started
 
-    # - name: Copy Flask app files to VM
-    #   copy:
-    #     src: ~/workspace/flask_vm_docker_setup
-    #     dest: /var/www/flask_app
+    - name: Copy Flask app files to VM
+      synchronize:
+        src: ~/workspace/flask_vm_docker_setup
+        dest: /var/www/flask_app
     
 
     - name: Stop and Remove Existing Docker container
