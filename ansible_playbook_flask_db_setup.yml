@@ -32,18 +32,12 @@
       shell: |
         docker rm -f flask-container
       ignore_errors: yes
-
-    - name: Drop Docker network if it exists
-      become: true
-      shell: |
-        if docker network inspect my-network &>/dev/null; then
-          docker network rm my-network
-        fi
-      ignore_errors: yes  
+  
 
     - name: Create Docker network
       become: true
       shell: docker network create my-network
+      ignore_errors: yes
 
     - name: Run PostgreSQL Docker container
       become: true
