@@ -1,0 +1,60 @@
+---
+- name: Build and Run Flask and PostgreSQL Containers
+  hosts: azurehosts
+  remote_user: azureuser
+  gather_facts: false
+  become: yes
+
+  tasks:
+    - name: Install Docker
+      become: true
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Start Docker service
+      become: true
+      service:
+        name: docker
+        state: started
+
+    - name: Pull PostgreSQL Docker image
+      become: true
+      shell: docker pull postgres:latest
+
+    - name: Copy Flask app files to VM
+      synchronize:
+        src: ~/workspace/flask_vm_docker_setup
+        dest: /var/www/flask_app
+
+    - name: Stop and Remove Existing Docker containers
+      become: true
+      shell: |
+        docker rm -f flask-container
+        docker rm -f postgres-container
+      ignore_errors: yes
+
+    - name: Create Docker network
+      become: true
+      shell: docker network create my-network
+
+    - name: Run PostgreSQL Docker container
+      become: true
+      shell: |
+        docker run -d --name postgres-container --network my-network \
+        -e POSTGRES_DB=postgres \
+        -e POSTGRES_USER=postgres \
+        -e POSTGRES_PASSWORD=mysecretpassword \
+        --restart unless-stopped \
+        postgres:latest
+
+    - name: Build Docker image for Flask app
+      become: true
+      shell: docker build -t my-flask-app /var/www/flask_app/flask_vm_docker_setup
+
+    - name: Run Flask Docker container
+      become: true
+      shell: |
+        docker run -d --name flask-container --network my-network -p 8000:8000 \
+        --restart unless-stopped \
+        my-flask-app
