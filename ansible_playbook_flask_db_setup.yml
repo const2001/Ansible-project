@@ -26,7 +26,7 @@
       synchronize:
         src: ~/workspace/flask_vm_docker_setup
         dest: /var/www/flask_app
-
+    
     - name: Stop and Remove Existing Docker containers
       become: true
       shell: |
@@ -34,6 +34,13 @@
         docker rm -f postgres-container
       ignore_errors: yes
 
+    - name: Drop Docker network if it exists
+      become: true
+      shell: |
+        if docker network inspect my-network &>/dev/null; then
+          docker network rm my-network
+        fi
+        
     - name: Create Docker network
       become: true
       shell: docker network create my-network
