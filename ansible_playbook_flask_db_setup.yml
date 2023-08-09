@@ -39,6 +39,7 @@
         if docker network inspect my-network &>/dev/null; then
           docker network rm my-network
         fi
+      ignore_errors: yes  
 
     - name: Create Docker network
       become: true
