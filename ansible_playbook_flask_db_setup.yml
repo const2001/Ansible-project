@@ -46,6 +46,7 @@
         -e POSTGRES_USER=postgres \
         -e POSTGRES_PASSWORD=mysecretpassword \
         --restart unless-stopped \
+        -p 5432:5432 \
         postgres:latest
 
     - name: Build Docker image for Flask app
