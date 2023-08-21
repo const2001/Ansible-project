@@ -1,5 +1,5 @@
 ---
-- name: Build and Run Flask and PostgreSQL Containers
+- name: Build and Run Flask admin
   hosts: azurehosts
   remote_user: azureuser
   gather_facts: false
@@ -32,7 +32,7 @@
 
     - name: Build Docker image for Flask admin app
       become: true
-      shell: docker build -t my-flask_admin-app /var/www/flask_app/flask_admin_vm_docker_setup
+      shell: docker build -t my-flask_admin-app /var/www/flask_admin/flask_admin_vm_docker_setup
 
     - name: Run Flask Docker container
       become: true
