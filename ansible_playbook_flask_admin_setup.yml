@@ -1,0 +1,42 @@
+---
+- name: Build and Run Flask and PostgreSQL Containers
+  hosts: azurehosts
+  remote_user: azureuser
+  gather_facts: false
+  become: yes
+
+  tasks:
+    - name: Install Docker
+      become: true
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Start Docker service
+      become: true
+      service:
+        name: docker
+        state: started
+
+    - name: Copy Flask admin app files to VM
+      synchronize:
+        src: ~/workspace/flask_admin_vm_docker_setup
+        dest: /var/www/flask_admin   
+    
+    - name: Stop and Remove Existing Docker containers
+      become: true
+      shell: |
+        docker rm -f flask_admin-container
+        
+      ignore_errors: yes
+
+    - name: Build Docker image for Flask admin app
+      become: true
+      shell: docker build -t my-flask_admin-app /var/www/flask_app/flask_admin_vm_docker_setup
+
+    - name: Run Flask Docker container
+      become: true
+      shell: |
+        docker run -d --name flask_admin-container --network my-network -p 8001:8001 \
+        --restart unless-stopped \
+        my-flask_admin-app  

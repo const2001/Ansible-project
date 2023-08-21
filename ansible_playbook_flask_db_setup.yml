@@ -26,12 +26,8 @@
       synchronize:
         src: ~/workspace/flask_vm_docker_setup
         dest: /var/www/flask_app
-    
-    - name: Stop and Remove Existing Docker containers
-      become: true
-      shell: |
-        docker rm -f flask-container
-      ignore_errors: yes
+
+ 
   
 
     - name: Create Docker network
@@ -62,3 +58,15 @@
         docker run -d --name flask-container --network my-network -p 8000:8000 \
         --restart unless-stopped \
         my-flask-app
+
+
+    - name: Build Docker image for Flask admin app
+      become: true
+      shell: docker build -t my-flask_admin-app /var/www/flask_app/flask_admin_vm_docker_setup
+
+    - name: Run Flask Docker container
+      become: true
+      shell: |
+        docker run -d --name flask_admin-container --network my-network -p 8001:8001 \
+        --restart unless-stopped \
+        my-flask_admin-app    
