@@ -34,7 +34,7 @@
       become: true
       shell: docker build -t my-flask_admin-app /var/www/flask_admin/flask_admin_vm_docker_setup
 
-    - name: Run Flask Docker container
+    - name: Run Flask admin Docker container
       become: true
       shell: |
         docker run -d --name flask_admin-container --network my-network -p 8001:8001 \
