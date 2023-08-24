@@ -56,12 +56,6 @@
       become: true
       shell: docker build -t my-flask-app /var/www/flask_app/flask_vm_docker_setup
 
-    - name: Run Flask Docker container
-      become: true
-      shell: |
-        docker run -d --name flask-container --network my-network -p 8000:8000 \
-        --restart unless-stopped \
-        my-flask-app
 
     - name: Run Flask Docker container
       become: true
