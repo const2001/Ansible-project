@@ -63,11 +63,6 @@
         --restart unless-stopped \
         my-flask-app
 
-
-    - name: Build Docker image for Flask admin app
-      become: true
-      shell: docker build -t my-flask_admin-app /var/www/flask_app/flask_admin_vm_docker_setup
-
     - name: Run Flask Docker container
       become: true
       shell: |
