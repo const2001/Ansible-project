@@ -27,7 +27,11 @@
         src: ~/workspace/flask_vm_docker_setup
         dest: /var/www/flask_app
 
- 
+    - name: Stop and Remove Existing Docker containers
+      become: true
+      shell: |
+        docker rm -f flask-container
+        
   
 
     - name: Create Docker network
