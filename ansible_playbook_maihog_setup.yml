@@ -1,0 +1,43 @@
+---
+- name: Build and Run Mailhog container
+  hosts: azurehosts
+  remote_user: azureuser
+  gather_facts: false
+  become: yes
+
+  tasks:
+    - name: Install Docker
+      become: true
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Start Docker service
+      become: true
+      service:
+        name: docker
+        state: started
+
+    - name: Copy Mailhog files to VM
+      synchronize:
+        src: ~/workspace/mailhog_vm_docker_setup
+        dest: /var/www/mailhog
+
+
+    - name: Stop and Remove Existing Docker containers
+      become: true
+      shell: |
+        docker rm -f mailhog-container
+        
+      ignore_errors: yes    
+    
+    - name: Build Docker image for Mailhog
+      become: true
+      shell: docker build -t mailhog-image /var/www/mailhog
+
+    - name: Run Mailhog Docker container
+      become: true
+      shell: |
+        docker run -d --name mailhog-container --network my-network -p 8025:8025 -p 1025:1025 \
+        --restart unless-stopped \
+        mailhog-image
