@@ -20,7 +20,7 @@
 
     - name: Copy Mailhog files to VM
       synchronize:
-        src: ~/workspace/mailhog_vm_docker_setup
+        src: ~/workspace/email_system_mailhog_setup
         dest: /var/www/mailhog
 
 
