@@ -60,6 +60,6 @@
     - name: Run Flask Docker container
       become: true
       shell: |
-        docker run -d --name flask_admin-container --network my-network -p 8001:8001 \
+        docker run -d --name flask-container --network my-network -p 8001:8001 \
         --restart unless-stopped \
-        my-flask_admin-app    
+        my-flask-app    
