@@ -22,6 +22,7 @@
       synchronize:
         src: ~/workspace/email_system_mailhog_setup
         dest: /var/www/mailhog
+        
 
 
     - name: Stop and Remove Existing Docker containers
