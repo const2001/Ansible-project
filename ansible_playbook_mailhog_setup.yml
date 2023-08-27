@@ -34,7 +34,7 @@
     
     - name: Build Docker image for Mailhog
       become: true
-      shell: docker build -t mailhog-image /var/www/mailhog
+      shell: docker build -t mailhog-image /var/www/mailhog/email_system_mailhog_setup
 
     - name: Run Mailhog Docker container
       become: true
